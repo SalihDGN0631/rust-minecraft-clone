@@ -2,7 +2,7 @@ mod core;
 
 use core::game::*;
 
-use macroquad::{color::{BLACK, BLUE, Color, GREEN, LIME, WHITE, YELLOW}, input::KeyCode::D, material::{Material, MaterialParams, load_material}, miniquad::{ShaderSource, gl::glCreateShader}, texture::Texture2D};
+use macroquad::{color::{BLACK, BLUE, Color, GREEN, LIME, RED, WHITE, YELLOW}, input::KeyCode::D, material::{Material, MaterialParams, load_material}, miniquad::{ShaderSource, gl::glCreateShader}, texture::Texture2D};
 
 use crate::core::{Block::Block, Registry::Registry};
 
@@ -30,7 +30,7 @@ async fn main() {
     _reg.register_block(Block::newBlock(
         Texture2D::from_file_with_format(include_bytes!("../assets/oak_leaves.png"), None),
          core::Block::BlockType::DIRT, 
-         BLUE)); // 3
+         RED)); // 3
     _reg.register_block(Block::newBlock(
         Texture2D::from_file_with_format(include_bytes!("../assets/gold_block.png"), None)
         , core::Block::BlockType::METAL

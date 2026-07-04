@@ -28,6 +28,8 @@ pub struct Block  {
 }
 
 
+
+
 impl Block {
 
     pub fn new(textures:Option<HashMap<String,Texture2D>>,_type:BlockType,_color : Color) -> Block {

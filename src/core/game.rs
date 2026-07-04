@@ -5,13 +5,13 @@ use std::fmt::Error;
 
 use macroquad::{miniquad::conf::Platform, prelude::*};
 
-use crate::core::{Registry::Registry, Renderer::{Renderer}};
+use crate::core::{FirstPersonController::FirstPersonController, Registry::Registry, Renderer::Renderer};
 
 pub fn _window_conf() -> Conf {
     Conf {
 
         platform : Platform {
-            
+            swap_interval : Some(1),
             ..Default::default()
         },
 
@@ -25,7 +25,7 @@ pub fn _window_conf() -> Conf {
     }
 }
 
-const DEFAULT_SKYBOX_COLOR: Color = Color::from_rgba(130, 177, 195, 1);
+const DEFAULT_SKYBOX_COLOR: Color = Color::from_rgba(135, 206, 250, 1);
 
 
 
@@ -34,13 +34,14 @@ pub struct Game {
     pub cam3d : Camera3D,
     pub delta_time : f32,
     pub renderer : Renderer,
-    pub registry : Registry
+    pub registry : Registry,
+    pub fpc : FirstPersonController
 
 
 }
 
 
-
+const DEBUG:bool = true;
 
 impl Game {
 
@@ -51,11 +52,16 @@ impl Game {
             delta_time : 0.0 as f32,
             registry : _reg.clone(),
             renderer : Renderer::new(_reg.Blocks),
+            fpc : FirstPersonController { pitch: 0.0, yaw: 0.0, mouse_grab: false, sensitivity: 0.3, move_speed: 5.0 }
         }
 
     }
 
     pub fn setup(&mut self) {
+        self.fpc.enable();
+        self.cam3d.up = Vec3 { x: 0.0, y: 1.0, z: 0.0 };
+        self.cam3d.position = vec3(5.0, 10.0, 5.0);
+        //self.cam3d.fovy = 90.0;
 
         self.renderer.BlocksToRender.insert((1,1,1), 0); // Stone
         self.renderer.BlocksToRender.insert((1,1,2),1); // Dirt
@@ -73,6 +79,14 @@ impl Game {
         clear_background(DEFAULT_SKYBOX_COLOR);
 
 
+        
+        let camTarget = self.fpc.step(self.cam3d.position,self.delta_time);
+        //self.cam3d.position = self.fpc.step_move(self.cam3d.position);
+        self.cam3d.target = camTarget.0;
+        self.cam3d.position = camTarget.1;
+        
+
+
         set_camera(&self.cam3d);
 
         //3D Drawing
@@ -80,6 +94,14 @@ impl Game {
 
 
         set_default_camera();
+
+        if DEBUG == true {
+
+            draw_text(format!("FPS : {}",get_fps()), 20.0, 25.0, 20.0, BLACK);
+            draw_text(format!("Coordinates : X {},Y {},Z {}",self.cam3d.position.x,self.cam3d.position.y,self.cam3d.position.z), 150.0, 25.0, 20.0, BLACK);
+            draw_text(format!("Pitch : {}, Yaw : {}",self.fpc.pitch,self.fpc.yaw), 600.0, 25.0, 20.0, BLACK);
+            
+        }
 
         // UI Drawing
 
